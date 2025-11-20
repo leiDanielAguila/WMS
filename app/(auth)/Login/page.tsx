@@ -1,8 +1,26 @@
+'use client';
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+
+interface UserCredentials {
+  email: string,
+  password: string
+}
 
 export default function LoginPage() {
+
+  const [user, setUser] = useState<UserCredentials>({
+    email: "",
+    password: ""
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log({user});
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-black">
       <div className="w-full max-w-md px-4">
@@ -20,7 +38,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form className="w-full space-y-4">
+          <form className="w-full space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -33,6 +51,8 @@ export default function LoginPage() {
                 type="email"
                 placeholder="name@company.com"
                 className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+                onChange={(e) => setUser(prev => ({ ...prev, email: e.target.value }))}
+                value={user.email}
               />
             </div>
 
@@ -48,6 +68,8 @@ export default function LoginPage() {
                 type="password"
                 placeholder="••••••••"
                 className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
+                onChange={(e) => setUser(prev => ({ ...prev, password: e.target.value }))}
+                value={user.password}
               />
             </div>
 
