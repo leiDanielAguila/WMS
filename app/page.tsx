@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -17,9 +18,11 @@ export default function Home() {
           </p>
         </div>
         
-        <Button size="lg" className="mt-4">
-          Login
-        </Button>
+        <Link href="/Login">
+          <Button size="lg" className="mt-4">
+            Login
+          </Button>
+        </Link>
         
         <div className="mt-8 flex flex-wrap justify-center gap-8 text-sm text-zinc-500 dark:text-zinc-500">
           <div className="flex flex-col items-center gap-1">
