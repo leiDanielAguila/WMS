@@ -1,28 +1,75 @@
-'use client';
+"use client";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-interface UserCredentials {
-  email: string,
-  password: string
-}
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback, useTransition } from "react";
+import { loginSchema } from "@/lib/validation/auth";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import { login } from "../action";
 
 export default function LoginPage() {
-
-  const [user, setUser] = useState<UserCredentials>({
+  const searchParams = useSearchParams();
+  const [pending, startTransition] = useTransition();
+  const [user, setUser] = useState({
     email: "",
-    password: ""
-  })
+    password: "",
+  });
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const message = searchParams.get("message");
+    const error = searchParams.get("error");
+    if (message) toast.success(message);
+    if (error) toast.error(error);
+  }, [searchParams]);
+
+  const handleFocus = useCallback((field: string) => {
+    setErrors((prev) => ({ ...prev, [field]: false }));
+  }, []);
+
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({user});
-  }
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    const data = {
+      email: String(fd.get("email") || "").trim(),
+      password: String(fd.get("password") || ""),
+    };
+
+    const result = loginSchema.safeParse(data);
+
+    if (!result.success) {
+      const fieldErrors: Record<string, boolean> = {};
+      result.error.issues.forEach((err) => {
+        toast.error(err.message);
+        if (err.path[0]) {
+          fieldErrors[String(err.path[0])] = true;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    setErrors({});
+
+    const serverFD = new FormData();
+    serverFD.set("email", data.email);
+    serverFD.set("password", data.password);
+
+    startTransition(() => {
+      login(serverFD);
+    });
+  }, []);
+
+  const baseInputClass =
+    "w-full rounded-md border bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 dark:bg-zinc-900 dark:text-zinc-50 border-zinc-300 dark:border-zinc-700 focus:ring-primary";
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-50 to-zinc-100 dark:from-zinc-900 dark:to-black">
+      <Toaster position="top-left" />
       <div className="w-full max-w-md px-4">
         <div className="flex flex-col items-center gap-6 rounded-lg border bg-white p-8 shadow-lg dark:border-zinc-800 dark:bg-zinc-950">
           <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-primary/10">
@@ -38,7 +85,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form className="w-full space-y-4" onSubmit={handleSubmit}>
+          <form className="w-full space-y-4" onSubmit={handleSubmit} noValidate>
             <div className="space-y-2">
               <label
                 htmlFor="email"
@@ -48,11 +95,13 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="name@company.com"
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-                onChange={(e) => setUser(prev => ({ ...prev, email: e.target.value }))}
-                value={user.email}
+                autoComplete="email"
+                onFocus={() => handleFocus("email")}
+                className={baseInputClass}
+                style={errors.email ? { borderColor: "#ef4444" } : undefined}
               />
             </div>
 
@@ -65,11 +114,13 @@ export default function LoginPage() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="••••••••"
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-                onChange={(e) => setUser(prev => ({ ...prev, password: e.target.value }))}
-                value={user.password}
+                autoComplete="current-password"
+                onFocus={() => handleFocus("password")}
+                className={baseInputClass}
+                style={errors.password ? { borderColor: "#ef4444" } : undefined}
               />
             </div>
 
@@ -88,8 +139,13 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full" size="lg">
-              Sign In
+            <Button
+              type="submit"
+              className="w-full"
+              size="lg"
+              disabled={pending}
+            >
+              {pending ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
