@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Package } from "lucide-react";
+import { Package, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useCallback, useTransition } from "react";
@@ -12,11 +12,8 @@ import { login } from "../action";
 export default function LoginPage() {
   const searchParams = useSearchParams();
   const [pending, startTransition] = useTransition();
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const message = searchParams.get("message");
@@ -81,7 +78,7 @@ export default function LoginPage() {
               Welcome Back
             </h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Sign in to your warehouse management account
+              Sign in to your work management account
             </p>
           </div>
 
@@ -112,16 +109,31 @@ export default function LoginPage() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                onFocus={() => handleFocus("password")}
-                className={baseInputClass}
-                style={errors.password ? { borderColor: "#ef4444" } : undefined}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  onFocus={() => handleFocus("password")}
+                  className={baseInputClass}
+                  style={
+                    errors.password ? { borderColor: "#ef4444" } : undefined
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-sm">

@@ -85,7 +85,7 @@ export default function SignUpPage() {
               Create Account
             </h1>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Get started with your warehouse management system
+              Get started with your work management system
             </p>
           </div>
 

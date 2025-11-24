@@ -65,10 +65,10 @@ export async function login(formdata: FormData) {
 
     if (error) {
         console.error("Sign up error", error.message);
-        redirect(`/Login?error=${encodeURIComponent('Login error ' + error.message)}`);
+        redirect(`/Login?error=${encodeURIComponent(error.message)}`);
 
         // implement a better error handling later
     }
 
-    return redirect('/')
+    return redirect('/dashboard')
 }

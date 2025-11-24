@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Warehouse Management System",
-  description: "Modern warehouse management solution",
+  title: "Task Manager",
+  description: "A simple task manager with modern features to handle personal goal tracking",
 };
 
 export default function RootLayout({
