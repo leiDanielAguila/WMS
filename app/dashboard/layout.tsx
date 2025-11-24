@@ -11,11 +11,12 @@ export default async function DashboardLayout({
   const user = await getAuthenticatedUser();
 
   const email:string = user.email?.toString() ?? "Unknown";
+  const name:string = "Christlei Aguila";
   return (
     <SidebarProvider>
-      <AppSidebar email={email}/>
+      <AppSidebar name={name}/>
       <main>
-        <SidebarTrigger />
+        
         {children}
       </main>
     </SidebarProvider>
